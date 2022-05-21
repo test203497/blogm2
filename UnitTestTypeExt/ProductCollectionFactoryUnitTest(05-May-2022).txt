@@ -1,0 +1,110 @@
+Url::- https://www.rakeshjesadiya.com/phpunit-test-for-factory-collection-in-magento-2/
+********************************************************************************************
+Rbj\ProductUnitTest\Model\ProductCollection.php
+-----------------------------------------------
+<?php
+namespace Rbj\ProductUnitTest\Model;
+
+/**
+ * Class ProductCollection
+ */
+class ProductCollection extends \Magento\Framework\Model\AbstractModel
+{
+    /**
+     * @var \Magento\Catalog\Model\ProductFactory
+     */
+    protected $productFactory;
+
+    public function __construct(
+        \Magento\Framework\Model\Context $context,
+        \Magento\Framework\Registry $registry,
+        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        \Magento\Catalog\Model\ProductFactory $productFactory,
+        array $data = []
+    ) {
+        $this->productFactory = $productFactory;
+        parent::__construct($context, $registry, $resource, $resourceCollection, $data);
+    }
+
+    /**
+     * @return \Magento\Catalog\Model\ResourceModel\Product\Collection
+     */
+    public function getProductsCollection()
+    {
+        /* @var $product \Magento\Catalog\Model\Product */
+        $product = $this->productFactory->create();
+        /* @var $collection \Magento\Catalog\Model\ResourceModel\Product\Collection */
+        $collection = $product->getCollection();
+
+        $collection->addAttributeToSelect('name', true)
+            ->addAttributeToFilter('status', ['in' => [1]])
+            ->setOrder('name');
+        return $collection;
+    }
+}
+
+
+Rbj\ProductUnitTest\Test\Unit\Model\ProductCollectionTest.php
+--------------------------------------------------------------
+<?php
+namespace Rbj\ProductUnitTest\Test\Unit\Model;
+
+use Magento\Framework\TestFramework\Unit\Helper\ObjectManager as ObjectManagerHelper;
+
+/**
+ * Class ProductCollectionTest
+ */
+class ProductCollectionTest extends \PHPUnit\Framework\TestCase
+{
+    /**
+     * @var \Rbj\ProductUnitTest\Model\ProductCollection
+     */
+    protected $productCollection;
+
+    /**
+     * @var ObjectManagerHelper
+     */
+    protected $objectManagerHelper;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|\Magento\Catalog\Model\ProductFactory
+     */
+
+    protected $productFactory;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|\Magento\Catalog\Model\Product
+     */
+    protected $product;
+
+    protected function setUp()
+    {
+        $this->product = $this->createMock(\Magento\Catalog\Model\Product::class);
+        $this->productFactory = $this->createPartialMock(\Magento\Catalog\Model\ProductFactory::class, ['create']);
+        $this->productFactory->expects($this->any())->method('create')->will($this->returnValue($this->product));
+
+        $this->objectManagerHelper = new ObjectManagerHelper($this);
+        $this->productCollection = $this->objectManagerHelper->getObject(
+            \Rbj\ProductUnitTest\Model\ProductCollection::class,
+            [
+                'productFactory' => $this->productFactory
+            ]
+        );
+    }
+
+    public function testGetProductsCollection()
+    {
+        /** @var \Magento\Catalog\Model\ResourceModel\Product\Collection $productCollection */
+        $productCollection =
+            $this->createMock(\Magento\Catalog\Model\ResourceModel\Product\Collection::class);
+        $this->product->expects($this->once())->method('getCollection')->will($this->returnValue($productCollection));
+
+        $productCollection->expects($this->once())->method('addAttributeToSelect')->will($this->returnSelf());
+        $productCollection->expects($this->once())->method('addAttributeToFilter')->will($this->returnSelf());
+        $productCollection->expects($this->once())->method('setOrder')->will($this->returnSelf());
+
+        $products = $this->productCollection->getProductsCollection();
+        $this->assertEquals($productCollection, $products);
+    }
+}

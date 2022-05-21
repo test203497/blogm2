@@ -1,0 +1,11 @@
+SyntexCommandUnitTest::
+-----------------------
+{phpunit_executable} -c {Magentoroot}/dev/test/{type}/phpunit.xml[.dist] path/to/module/test/dir
+
+./vendor/phpunit/phpunit/phpunit -c dev/tests/unit/phpunit.xml.dist app/code/Logic/Testlogic/Test/Unit   {Working Command on gitbase}
+
+php vendor/bin/phpunit -c dev/tests/unit/phpunit.xml.dist app/code/Rbj/ProductUnitTest/Test/Unit/Model/ProductCollectionTest.php
+
+./vendor/phpunit/phpunit/phpunit -c dev/tests/unit/phpunit.xml.dist app/code/Logic/Testlogic/Test/Unit/Model 
+
+php vendor/bin/phpunit -c dev/tests/unit/phpunit.xml.dist app/code/Logic/Testlogic/Test/Unit/Model/ProductCollectionTest.php

@@ -1,0 +1,50 @@
+url::- https://www.mageplaza.com/devdocs/magento-2-create-unit-test-file.html#how-to-create-a-unit-test-file
+url::- https://www.rakeshjesadiya.com/phpunit-test-for-factory-collection-in-magento-2/
+***************************************
+app/code/Mageplaza/Testing/TestingClass/SampleClass
+---------------------------------------------------
+<?php
+namespace Mageplaza\Testing\TestingClass;
+
+class SampleClass
+{
+    public function getMessage()
+    {
+        return 'Hello, this is sample test';
+    }
+}
+?>
+
+Mageplaza\Testing\Test\Unit\SampleTest
+---------------------------------------
+<?php
+
+namespace Mageplaza\Testing\Test\Unit;
+
+use Mageplaza\Testing\TestingClass\SampleClass;
+
+class SampleTest extends \PHPUnit\Framework\TestCase
+{
+    /**
+     * @var Mageplaza\Testing\TestingClass\SampleClass
+     */
+    protected $sampleClass;
+
+    /**
+     * @var string
+     */
+    protected $expectedMessage;
+
+    public function setUp()
+    {
+        $objectManager = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        $this->sampleClass = $objectManager->getObject('Mageplaza\Testing\TestingClass\SampleClass');
+        $this->expectedMessage = 'Hello, this is sample test';
+    }
+
+    public function testGetMessage()
+    {
+        $this->assertEquals($this->expectedMessage, $this->sampleClass->getMessage());
+    }
+
+}
